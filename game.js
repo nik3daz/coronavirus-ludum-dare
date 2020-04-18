@@ -1,3 +1,7 @@
+function lerp(start, end, amt) {
+  return (1 - amt) * start + amt * end;
+}
+
 planck.testbed(function (testbed) {
     var pl = planck, Vec2 = pl.Vec2;
     var world = new pl.World(Vec2(0, -10));
@@ -11,7 +15,7 @@ planck.testbed(function (testbed) {
     var touching = [];
 
     var ground = world.createBody();
-    ground.createFixture(pl.Edge(Vec2(-200.0, 0.0), Vec2(200.0, 0.0)), 0.0);
+    ground.createFixture(pl.Edge(Vec2(-200.0, 0.0), Vec2(200.0, 0.0)), 10.0);
 
     if (0) {
         sensor = ground.createFixture({
@@ -28,18 +32,19 @@ planck.testbed(function (testbed) {
 
     var circle = pl.Circle(1.0);
 
-    heroBody = world.createDynamicBody(Vec2(-10.0 + 3.0 * i, 20.0));
+    const friction = 2;
+    heroBody = world.createDynamicBody(Vec2(-10.0 + 3.0 * 3, 20.0));
     heroBody.setUserData({ touching: false });
-    heroBody.createFixture(circle, 1.0);
+    heroBody.createFixture(circle, friction);
 
-    for (var i = 0; i < COUNT; ++i) {
-        if (i == 3) continue;
-        touching[i] = { touching: false };
+    // for (var i = 0; i < COUNT; ++i) {
+    //     if (i == 3) continue;
+    //     touching[i] = { touching: false };
 
-        bodies[i] = world.createDynamicBody(Vec2(-10.0 + 3.0 * i, 20.0));
-        bodies[i].setUserData(touching[i])
-        bodies[i].createFixture(circle, 1.0);
-    }
+    //     bodies[i] = world.createDynamicBody(Vec2(-10.0 + 3.0 * i, 20.0));
+    //     bodies[i].setUserData(touching[i])
+    //     bodies[i].createFixture(circle, 1.0);
+    // }
 
     // Implement contact listener.
     world.on('begin-contact', function (contact) {
@@ -82,32 +87,23 @@ planck.testbed(function (testbed) {
     });
 
     testbed.step = function () {
-        // Traverse the contact results. Apply a force on shapes
-        // that overlap the sensor.
-        for (var i = 0; i < COUNT; ++i) {
-            if (i == 3 || !touching[i].touching) {
-                continue;
-            }
 
-            var body = bodies[i];
-            var ground = sensor.getBody();
+        var ground = sensor.getBody();
+        var circle = sensor.getShape();
+        var center = ground.getWorldPoint(circle.getCenter());
 
-            var circle = sensor.getShape();
-            var center = ground.getWorldPoint(circle.getCenter());
-
-            var position = body.getPosition();
-
-            var d = Vec2.sub(center, position);
-            if (d.lengthSquared() < pl.Math.EPSILON * pl.Math.EPSILON) {
-                continue;
-            }
-
-            d.normalize();
-            var F = Vec2.mul(d, 300.0);
-            body.applyForce(F, position, false);
-        }
 
         if (heroBody != null) {
+            var position = heroBody.getPosition();
+
+            var d = Vec2.sub(center, position);
+            if (d.lengthSquared() > pl.Math.EPSILON * pl.Math.EPSILON) {
+                d.normalize();
+                var F = Vec2.mul(d, 300.0);
+                heroBody.applyForce(F, position, false);
+            }
+            // --------------------
+
             if (testbed.activeKeys.right && testbed.activeKeys.left) {
               // MOVE THE HERO (check activeKeys for WADS and Arrows)
               // Apply NO FORCE
@@ -118,19 +114,24 @@ planck.testbed(function (testbed) {
               var F = Vec2(-10, 0);
               heroBody.applyForce(F, position, false);
             }
+            
+            if (testbed.activeKeys.up) {
+                var F = Vec2(0, 100);
+                heroBody.applyForce(F, position, false);
+            }
         }
 
         // MOVE THE CAMERA
+        // heroBody.Get
         var heroPos = heroBody.getPosition();
-        if (heroPos.x > testbed.x + 10) {
-            testbed.x = heroPos.x - 10;
-            
-            testbed.scaleX = 1;
-            testbed.scaleY = 2;
+        // if (heroPos.x > testbed.x + 10) {
+        //     testbed.x = heroPos.x - 10;
+        // } else if (heroPos.x < testbed.x - 10) {
+        //     testbed.x = heroPos.x + 10;
+        // }
 
-        } else if (heroPos.x < testbed.x - 10) {
-            testbed.x = heroPos.x + 10;
-        }
+        testbed.x = lerp(testbed.x, heroPos.x, 0.006);
+        testbed.y = lerp(testbed.y, heroPos.y - 20, 0.002);
     };
 
     return world;
