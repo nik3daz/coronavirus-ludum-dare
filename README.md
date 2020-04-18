@@ -4,4 +4,5 @@
 ```
 npm install
 tsc --watch
+python -m SimpleHTTPServer 8000
 ```
