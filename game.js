@@ -3,6 +3,7 @@ function lerp(start, end, amt) {
 }
 
 var hero;
+var jellies = [];
 
 planck.testbed(function(testbed) {
   let gravity = -80;
@@ -10,24 +11,30 @@ planck.testbed(function(testbed) {
     Vec2 = pl.Vec2;
   var world = new pl.World(Vec2(0, gravity));
 
-  // var bodies = [];
-  // var touching = [];
-
-  var ground = world.createBody();
-  let groundFixture = ground.createFixture(
-    pl.Edge(Vec2(-200.0, 0.0), Vec2(200.0, 0.0)),
-    20.0
-  );
-
-  var jelly = ground.createFixture({
-    shape: pl.Circle(Vec2(0.0, 10.0), 5.0),
-    isSensor: true
-  });
 
   hero = new Hero({
     body: world.createDynamicBody(Vec2(-20.0 + 3.0 * 3, 12.0)),
-    friction: 2
+    friction: 1
   });
+  var ground = world.createBody();
+  let groundFixture = ground.createFixture(
+    pl.Edge(Vec2(-200.0, 0.0), Vec2(200.0, 0.0)),
+    1.0
+  );
+
+  for (let h = 0; h < 10; h++) {
+    for (let i = 0; i < 10; i++) {
+      let j = ground.createFixture({
+        shape: pl.Circle(Vec2(Math.random() * 50, Math.random() * 100 + h * 100), 8.0),
+        isSensor: true,
+      });
+      j.render = {fill: 'blue', stroke:'transparent'};
+      j.gameObjectType = 'jelly';
+      jellies.push(j);
+    }
+  }
+
+
 
   // for (var i = 0; i < COUNT; ++i) {
   //     if (i == 3) continue;
@@ -50,17 +57,17 @@ planck.testbed(function(testbed) {
       hero.onGround = true;
     }
 
-    if (fixtureA === jelly) {
+    if (fixtureA.gameObjectType === 'jelly') {
       var userData = fixtureB.getBody().getUserData();
       if (userData) {
-        userData.touching = true;
+        userData.touching += 1;
       }
     }
 
-    if (fixtureB === jelly) {
+    if (fixtureB.gameObjectType === 'jelly') {
       var userData = fixtureA.getBody().getUserData();
       if (userData) {
-        userData.touching = true;
+        userData.touching += 1;
       }
     }
   });
@@ -77,35 +84,34 @@ planck.testbed(function(testbed) {
       hero.onGround = false;
     }
 
-    if (fixtureA === jelly) {
+    if (fixtureA.gameObjectType === 'jelly') {
       var userData = fixtureB.getBody().getUserData();
       if (userData) {
-        userData.touching = false;
+        userData.touching -= 1;
       }
     }
 
-    if (fixtureB === jelly) {
+    if (fixtureB.gameObjectType === 'jelly') {
       var userData = fixtureA.getBody().getUserData();
       if (userData) {
-        userData.touching = false;
+        userData.touching -= 1;
       }
     }
   });
 
   testbed.step = function() {
-    var ground = jelly.getBody();
-    var circle = jelly.getShape();
-    var center = ground.getWorldPoint(circle.getCenter());
-
     if (hero.body != null) {
       var position = hero.body.getPosition();
+      hero.body.setLinearDamping(0);
 
-      var d = Vec2.sub(center, position);
-      var distance = d.lengthSquared();
-      if (distance < 30) {
-        d.normalize();
-        var F = Vec2.mul(d, 300.0);
-        hero.body.applyForce(F, position, false);
+      if (hero.body.getUserData().touching) {
+        if (hero.body.getLinearVelocity().y < 0)
+          hero.body.setLinearDamping(0.4);
+
+        hero.body.setGravityScale(-0.8);
+
+      } else {
+        hero.body.setGravityScale(1);
       }
       // --------------------
 
@@ -113,17 +119,22 @@ planck.testbed(function(testbed) {
         // MOVE THE HERO (check activeKeys for WADS and Arrows)
         // Apply NO FORCE
       } else if (testbed.activeKeys.right) {
-        var F = Vec2(600, 0);
-        hero.body.applyForce(F, position, false);
+        var F = Vec2(400, 0);
+        hero.body.applyForce(F, position, true);
       } else if (testbed.activeKeys.left) {
-        var F = Vec2(-600, 0);
-        hero.body.applyForce(F, position, false);
+        var F = Vec2(-400, 0);
+        hero.body.applyForce(F, position, true);
       }
 
       let hero_v = hero.body.getLinearVelocity();
-      if (hero_v.x > 20) {
-        hero.body.setLinearVelocity(Vec2(20, hero_v.y));
+      if (Math.abs(hero_v.x) > 30) {
+          hero_v.x = Math.sign(hero_v.x) * 30;
       }
+    //   if (Math.abs(hero_v.y) > 60) {
+    //     hero_v.y = Math.sign(hero_v.y) * 60;
+    // }
+      // hero_v.x *= 0.99
+      hero.body.setLinearVelocity(hero_v);
     }
 
     // MOVE THE CAMERA
@@ -135,8 +146,8 @@ planck.testbed(function(testbed) {
     //     testbed.x = heroPos.x + 10;
     // }
 
-    testbed.x = lerp(testbed.x, heroPos.x, 0.006);
-    // testbed.y = lerp(testbed.y, heroPos.y - 20, 0.002);
+    testbed.x = lerp(testbed.x, heroPos.x, 0.08);
+    testbed.y = lerp(testbed.y, -heroPos.y, 0.08);
   };
 
   return world;

@@ -3,8 +3,8 @@ var pl = planck, Vec2 = pl.Vec2;
 class Hero {
     constructor({body, friction}) {
         this.body = body;
-        this.fixture = this.body.createFixture(pl.Box(1.0, 2.0), friction);
-        this.body.setUserData({ onGround: false, touching: false });
+        this.fixture = this.body.createFixture(pl.Circle(1.0), friction);
+        this.body.setUserData({ onGround: false, touching: 0 });
     }
 
     get onGround() { return this.body.getUserData().onGround; }
