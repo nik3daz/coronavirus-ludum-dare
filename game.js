@@ -107,6 +107,19 @@ planck.testbed(function (testbed) {
             body.applyForce(F, position, false);
         }
 
+        if (heroBody != null) {
+            if (testbed.activeKeys.right && testbed.activeKeys.left) {
+              // MOVE THE HERO (check activeKeys for WADS and Arrows)
+              // Apply NO FORCE
+            } else if (testbed.activeKeys.right) {
+              var F = Vec2(10, 0);
+              heroBody.applyForce(F, position, false);
+            } else if (testbed.activeKeys.left) {
+              var F = Vec2(-10, 0);
+              heroBody.applyForce(F, position, false);
+            }
+        }
+
         // MOVE THE CAMERA
         var heroPos = heroBody.getPosition();
         if (heroPos.x > testbed.x + 10) {

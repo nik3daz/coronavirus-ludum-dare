@@ -511,7 +511,7 @@ Viewer.prototype.drawCircle = function(shape, options) {
             ctx.fillStyle = options.fillStyle;
             ctx.fill();
         }
-        // ctx.lineTo(cx, cy);
+        ctx.lineTo(cx, cy);
         ctx.lineWidth = options.lineWidth;
         ctx.strokeStyle = options.strokeStyle;
         ctx.stroke();
