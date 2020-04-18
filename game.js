@@ -1,14 +1,14 @@
 function lerp(start, end, amt) {
   return (1 - amt) * start + amt * end;
 }
+var heroBody;
 
 planck.testbed(function (testbed) {
     var pl = planck, Vec2 = pl.Vec2;
-    var world = new pl.World(Vec2(0, -10));
+    var world = new pl.World(Vec2(0, -80));
 
     var COUNT = 7;
 
-    var heroBody;
 
     var sensor;
     var bodies = [];
@@ -97,9 +97,10 @@ planck.testbed(function (testbed) {
             var position = heroBody.getPosition();
 
             var d = Vec2.sub(center, position);
-            if (d.lengthSquared() > pl.Math.EPSILON * pl.Math.EPSILON) {
+            if (heroBody.getUserData().touching && d.lengthSquared() > pl.Math.EPSILON * pl.Math.EPSILON) {
                 d.normalize();
-                var F = Vec2.mul(d, 300.0);
+                let F = Vec2.mul(d, 200);
+                F = Vec2.add(F, Vec2(0, 80));
                 heroBody.applyForce(F, position, false);
             }
             // --------------------
@@ -108,31 +109,40 @@ planck.testbed(function (testbed) {
               // MOVE THE HERO (check activeKeys for WADS and Arrows)
               // Apply NO FORCE
             } else if (testbed.activeKeys.right) {
-              var F = Vec2(10, 0);
+              var F = Vec2(600, 0);
               heroBody.applyForce(F, position, false);
             } else if (testbed.activeKeys.left) {
-              var F = Vec2(-10, 0);
+              var F = Vec2(-600, 0);
               heroBody.applyForce(F, position, false);
             }
-            
-            if (testbed.activeKeys.up) {
-                var F = Vec2(0, 100);
-                heroBody.applyForce(F, position, false);
+
+            let hero_v = heroBody.getLinearVelocity();
+            if (hero_v.x > 20) {
+                heroBody.setLinearVelocity(Vec2(20, hero_v.y));
             }
+
+            
+         
         }
 
         // MOVE THE CAMERA
         // heroBody.Get
         var heroPos = heroBody.getPosition();
-        // if (heroPos.x > testbed.x + 10) {
+        // if (heroPos.x > testbed.x + 10) {a
         //     testbed.x = heroPos.x - 10;
         // } else if (heroPos.x < testbed.x - 10) {
         //     testbed.x = heroPos.x + 10;
         // }
 
         testbed.x = lerp(testbed.x, heroPos.x, 0.006);
-        testbed.y = lerp(testbed.y, heroPos.y - 20, 0.002);
+        // testbed.y = lerp(testbed.y, heroPos.y - 20, 0.002);
     };
 
     return world;
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key == 'ArrowUp' || e.key == 'w') {
+        heroBody.setLinearVelocity(planck.Vec2(0, 40));
+    }
 });
