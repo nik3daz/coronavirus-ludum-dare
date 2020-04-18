@@ -5,8 +5,51 @@
     <script src="node_modules/pixi.js/dist/pixi.js"></script>
     <script src="node_modules/planck-js/dist/planck.js"></script>
     <script src="index.js"></script>
+
+    <style>
+        html, body { margin:0; width:100%; height:100%; }
+    </style>
 </head>
 <body>
+
+    <script type="text/javascript">
+        let type = "WebGL"
+        if (!PIXI.utils.isWebGLSupported()) { type = "canvas" }
+
+        PIXI.utils.sayHello(type)
+
+        // Can we set resolution to some fraction to get a pixel art effect?
+        // http://pixijs.download/release/docs/PIXI.Application.html
+        let app = new PIXI.Application({
+                antialias: false,    // default: false
+                transparent: false, // default: false
+                resizeTo: document.getElementsByTagName("body")[0],
+                resolution: 1       // default: 1
+            });
+        app.renderer.backgroundColor = 0x061639;
+        app.renderer.view.style.position = "absolute";
+        app.renderer.view.style.display = "block";
+        
+        app.renderer.autoDensity = true;
+        // https://github.com/kittykatattack/scaleToWindow
+        // We could use this to scale the canvas proportionally to any browser window size
+
+        // Add the canvas that Pixi automatically created for you to the HTML document
+        document.body.appendChild(app.view);
+
+        // http://pixijs.download/release/docs/PIXI.Loader.html
+        const loader = PIXI.Loader.shared;
+        loader.add("img/water.jpg", "img/floor05.jpg", "wood_05_texture.jpg",
+            "img/cube-1.png", "img/cube-2.png", "img/cube-3.png", 
+            "img/cube-3-noshadow.png");
+
+        // The `load` method loads the queue of resources, and calls the passed in callback called once all
+        // resources have loaded.
+        loader.load((loader, resources) => {
+            // sprites.scoreFont = new PIXI.TilingSprite(resources.scoreFont.texture);
+        });
+
+    </script>
 
 </body>
 </html>

@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "pixi.js": "^5.2.1",
-    "planck-js": "^0.3.12",
+    "planck-js": "^0.3.12"
   },
   "devDependencies": {},
   "scripts": {
