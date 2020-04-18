@@ -78,11 +78,11 @@ planck.testbed = function(opts, callback) {
     testbed.height = 60;
     testbed.x = 0;
     testbed.y = -10;
-    testbed.ratio = 16;
+    // testbed.ratio = 16;
     testbed.hz = 60;
     testbed.speed = 1;
     testbed.activeKeys = {};
-    testbed.background = "#222222";
+    //testbed.background = "#222222";
     var statusText = "";
     var statusMap = {};
     function statusSet(name, value) {
@@ -13906,7 +13906,7 @@ function AppLoader(app, configs) {
   }
 
   root.background = function(color) {
-    canvas.style.backgroundColor = color;
+    canvas.style.background = color;
     return this;
   };
 

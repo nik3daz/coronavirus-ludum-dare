@@ -9,13 +9,14 @@ class Hero {
 
     get onGround() { return this.body.getUserData().onGround; }
     set onGround(onG) { 
-        console.log("onGround: " + onG);
+        // console.log("onGround: " + onG);
         this.body.getUserData().onGround = onG;
     }
 
     jump() {
         if (!this.onGround) return;
         console.log("JUMP");
-        this.body.setLinearVelocity(Vec2(0, 40));
+        let retainX = 0.7 * this.body.getLinearVelocity().x;
+        this.body.setLinearVelocity(Vec2(retainX, 40));
     }
 }

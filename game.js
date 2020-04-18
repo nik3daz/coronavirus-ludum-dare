@@ -1,11 +1,40 @@
-function lerp(start, end, amt) {
-  return (1 - amt) * start + amt * end;
-}
+var lvlData1 = [
+  { shape: "circle", pos: [0, 0], radius: 8 },
+  { shape: "circle", pos: [0, 0], radius: 8 },
+  { shape: "rect", pos: [0, 0], size: [0, 0] }
+];
 
 var hero;
 var jellies = [];
 
+function loadRandomCircles({ground}) {
+  for (let h = 0; h < 10; h++) {
+    for (let i = 0; i < 10; i++) {
+      var pos = Vec2(-25 + Math.random() * 50, Math.random() * 100 + h * 100);
+      pos.y += 65;
+      let j = ground.createFixture({
+        shape: pl.Circle(pos, 8.0),
+        isSensor: true
+      });
+      j.render = { fill: "blue", stroke: "transparent" };
+      j.gameObjectType = "jelly";
+      jellies.push(j);
+    }
+  }
+}
+
+function loadLevelData({lvlDat, ground}) {
+  lvlDat.forEach(element => {
+
+  });
+}
+
 planck.testbed(function(testbed) {
+  // testbed.background = "#222222";
+  // testbed.background = "linear-gradient(0deg, rgba(251,252,218,1) 0%, rgba(211,248,235,1) 60%, rgba(123,239,247,1) 100%)";
+  testbed.background = "linear-gradient(0deg, rgba(144,92,82,1) 0%, rgba(128,56,102,1) 20%, rgba(61,5,101,1) 63%, rgba(10,2,32,1) 100%)";
+  testbed.ratio = 16; // Pixel res
+
   let gravity = -80;
   var pl = planck,
     Vec2 = pl.Vec2;
@@ -13,27 +42,24 @@ planck.testbed(function(testbed) {
 
 
   hero = new Hero({
-    body: world.createDynamicBody(Vec2(-20.0 + 3.0 * 3, 12.0)),
+    body: world.createDynamicBody(Vec2(0, -10)),
     friction: 1
   });
-  var ground = world.createBody();
-  let groundFixture = ground.createFixture(
-    pl.Edge(Vec2(-200.0, 0.0), Vec2(200.0, 0.0)),
-    1.0
-  );
 
-  for (let h = 0; h < 10; h++) {
-    for (let i = 0; i < 10; i++) {
-      let j = ground.createFixture({
-        shape: pl.Circle(Vec2(Math.random() * 50, Math.random() * 100 + h * 100), 8.0),
-        isSensor: true,
-      });
-      j.render = {fill: 'blue', stroke:'transparent'};
-      j.gameObjectType = 'jelly';
-      jellies.push(j);
-    }
-  }
+  let groundSize = Vec2(48, 64);
+  var ground = world.createBody(Vec2(0,-88));
+  let groundFixture = ground.createFixture(pl.Box(groundSize.x, groundSize.y), 1.0);
+  groundFixture.render = { fill: "#000", stroke: "transparent" };
+  
+  let wallHeight = 2047; // 2048 is the max for some reason?
+  let wallStyle = { fill: "000", stroke: "transparent" };
+  ground.createFixture(pl.Box(2, wallHeight, Vec2(groundSize.x-2, wallHeight+groundSize.y-1)), 1.0)
+    .render = { fill: "000", stroke: "transparent" };
+  ground.createFixture(pl.Box(2, wallHeight, Vec2(2-groundSize.x, wallHeight+groundSize.y-1)), 1.0)
+    .render = { fill: "000", stroke: "transparent" };
 
+  loadRandomCircles({ground: ground});
+  // loadLevelData({ lvlDat: lvlData1, ground: ground });
 
 
   // for (var i = 0; i < COUNT; ++i) {
@@ -100,6 +126,8 @@ planck.testbed(function(testbed) {
   });
 
   testbed.step = function() {
+    // console.log (testbed.width);
+    
     if (hero.body != null) {
       var position = hero.body.getPosition();
       hero.body.setLinearDamping(0);
@@ -138,16 +166,9 @@ planck.testbed(function(testbed) {
     }
 
     // MOVE THE CAMERA
-    // hero.body.Get
     var heroPos = hero.body.getPosition();
-    // if (heroPos.x > testbed.x + 10) {
-    //     testbed.x = heroPos.x - 10;
-    // } else if (heroPos.x < testbed.x - 10) {
-    //     testbed.x = heroPos.x + 10;
-    // }
-
     testbed.x = lerp(testbed.x, heroPos.x, 0.08);
-    testbed.y = lerp(testbed.y, -heroPos.y, 0.08);
+    testbed.y = lerp(testbed.y, Math.min(-heroPos.y, 0), 0.08);
   };
 
   return world;
@@ -159,3 +180,7 @@ document.addEventListener("keydown", e => {
     hero.jump();
   }
 });
+
+function lerp(start, end, amt) {
+  return (1 - amt) * start + amt * end;
+}
