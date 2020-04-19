@@ -28,6 +28,7 @@ let lvlData1 = [
   { shape: "rect", type: "ground", pos: [-31, 162], size: [10, 2], rotation: 0 },
   // ===========================================================================
   
+  { shape: "rect", type: "antigrav", pos: [40, 190], size: [8, 32], rotation: 30 }
 
 
 ];
@@ -51,13 +52,15 @@ planck.testbed(function (testbed) {
   testbed.ratio = 16; // Pixel res
   gravity = -80;
   world = new pl.World(Vec2(0, gravity));
-  ground = world.createBody(Vec2(0, -88));
-  groundSize = Vec2(48, 64);
-  groundFixture = ground.createFixture(pl.Box(groundSize.x, groundSize.y), 1.0);
+
   hero = new Hero({
     body: world.createDynamicBody(Vec2(0, -10)),
     friction: 1
   });
+
+  ground = world.createBody(Vec2(0, -88));
+  groundSize = Vec2(48, 64);
+  groundFixture = ground.createFixture(pl.Box(groundSize.x, groundSize.y), 1.0);
 
   groundFixture.render = renderStyle['ground'];
   groundFixtures.push(groundFixture);
@@ -215,7 +218,8 @@ function loadLevelData({ lvlDat, groundHeight }) {
     if (element.shape === "circle") {
       shape = pl.Circle(pos, element.radius);
     } else if (element.shape === "rect") {
-      shape = pl.Box(element.size[0], element.size[1], pos);
+      let rotation = element.rotation ?? 0;
+      shape = pl.Box(element.size[0], element.size[1], pos, rotation);
     } else {
       let verts = Vec2[element.vertices.size];
       // TODO: Populate the array
