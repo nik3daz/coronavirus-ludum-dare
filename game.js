@@ -1,10 +1,10 @@
-var renderStyle = {
+let renderStyle = {
   "antigrav" : { fill: "blue", stroke: "transparent" },
   "wall" : { fill: "#000", stroke: "transparent" },
   "ground" : { fill: "#000", stroke: "transparent" }
 };
 
-var lvlData1 = [
+let lvlData1 = [
   { shape: "circle", type: "antigrav", pos: [11, 0], radius: 9 },
   { shape: "circle", type: "antigrav", pos: [-10, 24], radius: 12 },
   { shape: "circle", type: "antigrav", pos: [-30, 40], radius: 8 },
@@ -32,30 +32,33 @@ var lvlData1 = [
 
 ];
 
-var hero;
-var antigravList = [];
-var groundFixtures = [];
+pl = planck,
+Vec2 = pl.Vec2;
 
-planck.testbed(function(testbed) {
+let antigravList = [];
+let groundFixtures = [];
+let gravity;
+let world;
+let ground;
+let groundSize;
+let groundFixture;
+let hero;
+
+planck.testbed(function (testbed) {
   // testbed.background = "#222222";
   // testbed.background = "linear-gradient(0deg, rgba(251,252,218,1) 0%, rgba(211,248,235,1) 60%, rgba(123,239,247,1) 100%)";
   testbed.background = "linear-gradient(0deg, rgba(144,92,82,1) 0%, rgba(128,56,102,1) 20%, rgba(61,5,101,1) 63%, rgba(10,2,32,1) 100%)";
   testbed.ratio = 16; // Pixel res
-
-  let gravity = -80;
-  var pl = planck,
-    Vec2 = pl.Vec2;
-  var world = new pl.World(Vec2(0, gravity));
-
-
+  gravity = -80;
+  world = new pl.World(Vec2(0, gravity));
+  ground = world.createBody(Vec2(0, -88));
+  groundSize = Vec2(48, 64);
+  groundFixture = ground.createFixture(pl.Box(groundSize.x, groundSize.y), 1.0);
   hero = new Hero({
     body: world.createDynamicBody(Vec2(0, -10)),
     friction: 1
   });
 
-  let groundSize = Vec2(48, 64);
-  var ground = world.createBody(Vec2(0,-88));
-  let groundFixture = ground.createFixture(pl.Box(groundSize.x, groundSize.y), 1.0);
   groundFixture.render = renderStyle['ground'];
   groundFixtures.push(groundFixture);
   
@@ -73,8 +76,8 @@ planck.testbed(function(testbed) {
 
   // Implement contact listener.
   world.on("begin-contact", function(contact) {
-    var fixtureA = contact.getFixtureA();
-    var fixtureB = contact.getFixtureB();
+    let fixtureA = contact.getFixtureA();
+    let fixtureB = contact.getFixtureB();
 
     for (let i = 0; i < groundFixtures.length; i++) {
       if (groundFixtures[i] == fixtureA && fixtureB === hero.fixture ||
@@ -85,14 +88,14 @@ planck.testbed(function(testbed) {
     }
 
     if (fixtureA.gameObjectType === 'antigrav') {
-      var userData = fixtureB.getBody().getUserData();
+      let userData = fixtureB.getBody().getUserData();
       if (userData) {
         userData.touching += 1;
       }
     }
 
     if (fixtureB.gameObjectType === 'antigrav') {
-      var userData = fixtureA.getBody().getUserData();
+      let userData = fixtureA.getBody().getUserData();
       if (userData) {
         userData.touching += 1;
       }
@@ -101,8 +104,8 @@ planck.testbed(function(testbed) {
 
   // Implement contact listener.
   world.on("end-contact", function(contact) {
-    var fixtureA = contact.getFixtureA();
-    var fixtureB = contact.getFixtureB();
+    let fixtureA = contact.getFixtureA();
+    let fixtureB = contact.getFixtureB();
 
     for (let i = 0; i < groundFixtures.length; i++) {
       if (groundFixtures[i] == fixtureA && fixtureB === hero.fixture ||
@@ -113,14 +116,14 @@ planck.testbed(function(testbed) {
     }
 
     if (fixtureA.gameObjectType === 'antigrav') {
-      var userData = fixtureB.getBody().getUserData();
+      let userData = fixtureB.getBody().getUserData();
       if (userData) {
         userData.touching -= 1;
       }
     }
 
     if (fixtureB.gameObjectType === 'antigrav') {
-      var userData = fixtureA.getBody().getUserData();
+      let userData = fixtureA.getBody().getUserData();
       if (userData) {
         userData.touching -= 1;
       }
@@ -131,7 +134,7 @@ planck.testbed(function(testbed) {
     // console.log (testbed.width);
     
     if (hero.body != null) {
-      var position = hero.body.getPosition();
+      let position = hero.body.getPosition();
       hero.body.setLinearDamping(0);
 
       if (hero.body.getUserData().touching) {
@@ -149,10 +152,10 @@ planck.testbed(function(testbed) {
         // MOVE THE HERO (check activeKeys for WADS and Arrows)
         // Apply NO FORCE
       } else if (testbed.activeKeys.right) {
-        var F = Vec2(400, 0);
+        let F = Vec2(400, 0);
         hero.body.applyForce(F, position, true);
       } else if (testbed.activeKeys.left) {
-        var F = Vec2(-400, 0);
+        let F = Vec2(-400, 0);
         hero.body.applyForce(F, position, true);
       }
 
@@ -168,7 +171,7 @@ planck.testbed(function(testbed) {
     }
 
     // MOVE THE CAMERA
-    var heroPos = hero.body.getPosition();
+    let heroPos = hero.body.getPosition();
     testbed.x = lerp(testbed.x, heroPos.x, 0.08);
     testbed.y = lerp(testbed.y, Math.min(-heroPos.y, 0), 0.08);
   };
@@ -187,10 +190,10 @@ function lerp(start, end, amt) {
   return (1 - amt) * start + amt * end;
 }
 
-function loadRandomCircles({ ground, groundHeight }) {
+function loadRandomCircles({ groundHeight }) {
   for (let h = 0; h < 10; h++) {
     for (let i = 0; i < 10; i++) {
-      var pos = Vec2(-25 + Math.random() * 50, Math.random() * 100 + h * 100);
+      let pos = Vec2(-25 + Math.random() * 50, Math.random() * 100 + h * 100);
       pos.y += groundHeight;
       let j = ground.createFixture({
         shape: pl.Circle(pos, 8.0),
@@ -203,25 +206,24 @@ function loadRandomCircles({ ground, groundHeight }) {
   }
 }
 
-function loadLevelData({ lvlDat, ground, groundHeight }) {
+function loadLevelData({ lvlDat, groundHeight }) {
   lvlDat.forEach(element => {
-    var newObj = null;
+    let newObj = null;
     let pos = Vec2(element.pos[0], element.pos[1] + groundHeight);
     let shape;
-    console.log(element);
 
     if (element.shape === "circle") {
       shape = pl.Circle(pos, element.radius);
     } else if (element.shape === "rect") {
       shape = pl.Box(element.size[0], element.size[1], pos);
     } else {
-      var verts = Vec2[element.vertices.size];
+      let verts = Vec2[element.vertices.size];
       // TODO: Populate the array
       shape = pl.Polygon(verts);
     }
 
     if (element.type === "antigrav") {
-      newObj = ground.createFixture({ shape: shape, isSensor: true });
+      newObj = createAntigravFixture(shape);
       antigravList.push(newObj);
     } else if (element.type === "wall" || element.type === "ground") {
       newObj = ground.createFixture({ shape: shape }, 1.0);
@@ -233,4 +235,8 @@ function loadLevelData({ lvlDat, ground, groundHeight }) {
       newObj.render = renderStyle[element.type];
     }
   });
+}
+
+function createAntigravFixture(shape) {
+  return ground.createFixture({ shape: shape, isSensor: true });
 }

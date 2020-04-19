@@ -82,7 +82,7 @@ planck.testbed = function(opts, callback) {
     testbed.hz = 60;
     testbed.speed = 1;
     testbed.activeKeys = {};
-    //testbed.background = "#222222";
+    // testbed.background = "#222222";
     var statusText = "";
     var statusMap = {};
     function statusSet(name, value) {
@@ -423,17 +423,21 @@ Viewer.prototype.renderWorld = function(world) {
                 }
                 var type = f.getType();
                 var shape = f.getShape();
-                if (type == "circle") {
-                    f.ui = viewer.drawCircle(shape, this._options);
-                }
-                if (type == "edge") {
-                    f.ui = viewer.drawEdge(shape, this._options);
-                }
-                if (type == "polygon") {
-                    f.ui = viewer.drawPolygon(shape, this._options);
-                }
-                if (type == "chain") {
-                    f.ui = viewer.drawChain(shape, this._options);
+                if (f.drawCallback) {
+                    f.ui = f.drawCallback(f);
+                } else {
+                    if (type == "circle") {
+                        f.ui = viewer.drawCircle(shape, this._options);
+                    }
+                    if (type == "edge") {
+                        f.ui = viewer.drawEdge(shape, this._options);
+                    }
+                    if (type == "polygon") {
+                        f.ui = viewer.drawPolygon(shape, this._options);
+                    }
+                    if (type == "chain") {
+                        f.ui = viewer.drawChain(shape, this._options);
+                    }
                 }
                 if (f.ui) {
                     f.ui.appendTo(viewer);
