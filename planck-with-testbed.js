@@ -220,10 +220,10 @@ planck.testbed = function(opts, callback) {
           "rgba(255,255,255,0.2)"
         );
       }
-      if (lastDrawHash !== drawHash) {
+    //   if (lastDrawHash !== drawHash) {
         lastDrawHash = drawHash;
         stage.touch();
-      }
+    //   }
       drawHash = "";
       return true;
     });
@@ -424,7 +424,7 @@ Viewer.prototype.renderWorld = function(world) {
                 var type = f.getType();
                 var shape = f.getShape();
                 if (f.drawCallback) {
-                    f.ui = f.drawCallback(f);
+                    f.ui = f.drawCallback(f, this._options, Stage);
                 } else {
                     if (type == "circle") {
                         f.ui = viewer.drawCircle(shape, this._options);
@@ -444,6 +444,7 @@ Viewer.prototype.renderWorld = function(world) {
                 }
             }
             if (f.ui) {
+                f.ui.touch();
                 var p = b.getPosition(), r = b.getAngle();
                 if (f.ui.__lastX !== p.x || f.ui.__lastY !== p.y || f.ui.__lastR !== r) {
                     f.ui.__lastX = p.x;
