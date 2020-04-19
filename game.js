@@ -10,9 +10,9 @@ let lvlData1 = [
   { shape: "circle", type: "antigrav", pos: [-30, 40], radius: 8 },
 
   { shape: "circle", type: "antigrav", pos: [-36, 67], radius: 3 },
-  { shape: "circle", type: "antigrav", pos: [-35, 79], radius: 3.5 },
-  { shape: "circle", type: "antigrav", pos: [-22, 77], radius: 7 },
-  { shape: "circle", type: "antigrav", pos: [-38, 92], radius: 5 },
+  { shape: "circle", type: "antigrav", pos: [-32, 79], radius: 3.5 },
+  { shape: "circle", type: "antigrav", pos: [-18, 75], radius: 7 },
+  { shape: "circle", type: "antigrav", pos: [-34, 92], radius: 4.5 },
   { shape: "circle", type: "antigrav", pos: [-28, 110], radius: 4 },
 
   // { shape: "rect", type: "antigrav", pos: [-30, 30], size: [1, 3] },
@@ -28,10 +28,18 @@ let lvlData1 = [
   { shape: "rect", type: "ground", pos: [-31, 162], size: [10, 2], rotation: 0 },
   // ===========================================================================
   
-  { shape: "rect", type: "antigrav", pos: [40, 190], size: [8, 32], rotation: 30 }
+  // Upward SLIDE
+  { shape: "rect", type: "wall", pos: [-0.8, 175.5], size: [32, 0.8], rotation: -10*Math.PI/180 },
+  { shape: "rect", type: "wall", pos: [0.8, 184.5], size: [38, 0.8], rotation: -10*Math.PI/180 },
+  { shape: "rect", type: "antigrav", pos: [0, 180], size: [32, 4], rotation: -10*Math.PI/180 },
+  { shape: "circle", type: "antigrav", pos: [34, 156], radius: 10 },
+  { shape: "circle", type: "antigrav", pos: [-32, 198], radius: 14 }
 
 
 ];
+
+// let heroStartLoc = Vec2(0, -10);
+let heroStartLoc = Vec2(-31, 153);
 
 pl = planck,
 Vec2 = pl.Vec2;
@@ -54,7 +62,7 @@ planck.testbed(function (testbed) {
   world = new pl.World(Vec2(0, gravity));
 
   hero = new Hero({
-    body: world.createDynamicBody(Vec2(0, -10)),
+    body: world.createDynamicBody(heroStartLoc),
     friction: 1
   });
 
@@ -89,15 +97,15 @@ planck.testbed(function (testbed) {
       antigrav = fixtureA;
 
     let heroFixture;
-      if (fixtureB === hero.fixture)
-        heroFixture = fixtureB;
-  
-      if (fixtureA === hero.fixture)
-        heroFixture = fixtureA;
+    if (fixtureB === hero.fixture)
+      heroFixture = fixtureB;
+
+    if (fixtureA === hero.fixture)
+      heroFixture = fixtureA;
 
     for (let i = 0; i < groundFixtures.length; i++) {
-      if (groundFixtures[i] == fixtureA && fixtureB === hero.fixture ||
-          groundFixtures[i] == fixtureB && fixtureA === hero.fixture) {
+      if (groundFixtures[i] === fixtureA && fixtureB === hero.fixture ||
+          groundFixtures[i] === fixtureB && fixtureA === hero.fixture) {
         hero.onGround = true;
         break;
       }
@@ -105,14 +113,20 @@ planck.testbed(function (testbed) {
 
     if (antigrav) {
       let userData = hero.body.getUserData();
-      let ag_p = antigrav.getShape().getCenter();
-      ag_p = Vec2.add(ag_p, antigrav.getBody().getTransform().p);
-      let h_p = hero.body.getPosition();
-      let d = Vec2.sub(h_p, ag_p);
-      let angle = Math.atan2(d.y, d.x);
+      let ag_shape = antigrav.getShape();
+      // console.log(ag_shape);
+      if (ag_shape.m_type === 'circle') {
+        // Apply forces to Circle Shaoes
+        let ag_p = ag_shape.getCenter();
+        ag_p = Vec2.add(ag_p, antigrav.getBody().getTransform().p);
+        let h_p = hero.body.getPosition();
+        let d = Vec2.sub(h_p, ag_p);
+        let angle = Math.atan2(d.y, d.x);
 
-      // let h_v = hero.body.getLinearVelocity().length();
-      antigrav.splash(angle, -2);
+        // let h_v = hero.body.getLinearVelocity().length();
+        antigrav.splash(angle, -2);
+      }
+      
       if (userData) {
         userData.touching += 1;
       }
@@ -125,8 +139,8 @@ planck.testbed(function (testbed) {
     let fixtureB = contact.getFixtureB();
 
     for (let i = 0; i < groundFixtures.length; i++) {
-      if (groundFixtures[i] == fixtureA && fixtureB === hero.fixture ||
-          groundFixtures[i] == fixtureB && fixtureA === hero.fixture) {
+      if (groundFixtures[i] === fixtureA && fixtureB === hero.fixture ||
+          groundFixtures[i] === fixtureB && fixtureA === hero.fixture) {
         hero.onGround = false;
         break;
       }
@@ -154,14 +168,18 @@ planck.testbed(function (testbed) {
 
     if (antigrav) {
       let userData = hero.body.getUserData();
-      let ag_p = antigrav.getShape().getCenter();
-      ag_p = Vec2.add(ag_p, antigrav.getBody().getTransform().p);
-      let h_p = hero.body.getPosition();
-      let d = Vec2.sub(h_p, ag_p);
-      let angle = Math.atan2(d.y, d.x);
+      let ag_shape = antigrav.getShape();
+      if (ag_shape.m_type === 'circle') {
+        // Apply forces to Circle Shaoes
+        let ag_p = ag_shape.getCenter();
+        ag_p = Vec2.add(ag_p, antigrav.getBody().getTransform().p);
+        let h_p = hero.body.getPosition();
+        let d = Vec2.sub(h_p, ag_p);
+        let angle = Math.atan2(d.y, d.x);
 
-      // let h_v = hero.body.getLinearVelocity().length();
-      antigrav.splash(angle, 2);
+        // let h_v = hero.body.getLinearVelocity().length();
+        antigrav.splash(angle, 2);
+      }
     }
   });
 
@@ -268,7 +286,7 @@ function loadLevelData({ lvlDat, groundHeight }) {
       antigravList.push(newObj);
     } else if (element.type === "wall" || element.type === "ground") {
       newObj = ground.createFixture({ shape: shape }, 1.0);
-      groundFixtures.push(newObj);
+      if (element.type === "ground") { groundFixtures.push(newObj); }
     }
 
     if (newObj != null) {
