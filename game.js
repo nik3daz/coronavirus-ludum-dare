@@ -1,20 +1,20 @@
 import { createAntigravFixture } from '/antigrav.js';
 
 let renderStyle = {
-  "antigrav" : { fill: "blue", stroke: "transparent" },
-  "wall" : { fill: "#000", stroke: "transparent" },
-  "ground" : { fill: "#000", stroke: "transparent" }
+  antigrav: { fill: "#00428e", stroke: "transparent" },
+  wall: { fill: "#17192f", stroke: "transparent" }, // 14240b
+  ground: { fill: "#17192f", stroke: "transparent" } // 1e2f15
 };
 
 // Use this during LevelDesign for faster loading
 let sectionsToLoad = [
   true, // Section 1
   true, // Section 2
-  false  // Section 3
+  true  // Section 3
 ];
 
-let heroStartLoc = Vec2(30, -20);
-// let heroStartLoc = Vec2(-31, 153);
+let heroStartLoc = Vec2(-20, -20);
+// let heroStartLoc = Vec2(10, 301);
 // let heroStartLoc = Vec2(0, 200);
 
 pl = planck,
@@ -32,8 +32,11 @@ let hero;
 planck.testbed(function (testbed) {
   // testbed.background = "#222222";
   // testbed.background = "linear-gradient(0deg, rgba(251,252,218,1) 0%, rgba(211,248,235,1) 60%, rgba(123,239,247,1) 100%)";
-  testbed.background = "linear-gradient(0deg, rgba(144,92,82,1) 0%, rgba(128,56,102,1) 20%, rgba(61,5,101,1) 63%, rgba(10,2,32,1) 100%)";
-  testbed.ratio = 16; // Pixel res
+  // testbed.background = "linear-gradient(0deg, rgba(149,224,189,1) 0%, rgba(95,180,247,1) 38%, rgba(3,68,152,1) 100%)";
+  // testbed.background = "linear-gradient(0deg, rgba(215,207,155,1) 0%, rgba(144,189,221,1) 38%, rgba(59,113,255,1) 100%)";
+  testbed.background = "linear-gradient(0deg, rgba(97,182,200,1) 0%, rgba(103,162,204,1) 38%, rgba(41,82,190,1) 100%)";
+  // testbed.background = "linear-gradient(0deg, rgba(144,92,82,1) 0%, rgba(128,56,102,1) 20%, rgba(61,5,101,1) 63%, rgba(10,2,32,1) 100%)";
+  testbed.ratio = 8; // Pixel res
   gravity = -80;
   world = new pl.World(Vec2(0, gravity));
 
@@ -48,21 +51,23 @@ planck.testbed(function (testbed) {
 
   groundFixture.render = renderStyle['ground'];
   groundFixtures.push(groundFixture);
+
+  // light-red: #ff9fa0
+  hero.body.render = { fill: "#ffe79e", stroke: "transparent" }; // 
   
   let wallHeight = 2047; // 2048 is the max for some reason?
   let wallWidth = 64;
-  let wallStyle = { fill: "000", stroke: "transparent" };
   ground.createFixture(pl.Box(wallWidth, wallHeight, Vec2(groundSize.x-wallWidth, wallHeight+groundSize.y-1)), 1.0)
-    .render = wallStyle;
+    .render = renderStyle["wall"];
   ground.createFixture(pl.Box(wallWidth, wallHeight, Vec2(wallWidth-groundSize.x, wallHeight+groundSize.y-1)), 1.0)
-    .render = wallStyle;
+    .render = renderStyle["wall"];
 
   // -------------------------------------
     // loadRandomCircles({ground: ground, groundHeight:groundSize.y});
   if (sectionsToLoad.length > 0 && sectionsToLoad[0])
-    loadLevelData({ lvlDat: section2Data, groundHeight: groundSize.y });
+    loadLevelData({ lvlDat: section1Data, groundHeight: groundSize.y });
   if (sectionsToLoad.length > 1 && sectionsToLoad[1])
-    loadLevelData({ lvlDat: section3Data, groundHeight: groundSize.y });
+    loadLevelData({ lvlDat: section2Data, groundHeight: groundSize.y });
   if (sectionsToLoad.length > 2 && sectionsToLoad[2])
     loadLevelData({ lvlDat: section3Data, groundHeight: groundSize.y });
 
@@ -232,11 +237,49 @@ function loadRandomCircles({ groundHeight }) {
 
 // =================================================
 
-let section2YDelta = 35;
+let section1YDelta = 0;
+let section1Data = [
+  { shape: "rect", type: "antigrav", pos: [0, 23 + section1YDelta], size: [50, 12], rotation: 0 },
+  { shape: "circle", type: "antigrav", pos: [-20, 0 + section1YDelta], radius: 2 },
+  
+  { shape: "circle", type: "antigrav", pos: [22, 56 + section1YDelta], radius: 6 },
+  { shape: "circle", type: "antigrav", pos: [0, 82 + section1YDelta], radius: 16 },
+  { shape: "circle", type: "antigrav", pos: [-14, 132 + section1YDelta], radius: 24 },
+
+  { shape: "rect", type: "ground", pos: [18, 170+section1YDelta], size: [24, 2] },
+  { shape: "rect", type: "wall", pos: [-4, 173+section1YDelta], size: [2, 2] },
+  { shape: "rect", type: "wall", pos: [-4, 203+section1YDelta], size: [2, 8] },
+  { shape: "rect", type: "ground", pos: [-22, 210+section1YDelta], size: [20, 2] },
+
+  { shape: "rect", type: "wall", pos: [-25, 195+section1YDelta], size: [25, 2], rotation: 35*Math.PI/180 },
+  { shape: "circle", type: "antigrav", pos: [33, 184 + section1YDelta], radius: 4 },
+  { shape: "circle", type: "antigrav", pos: [17, 198 + section1YDelta], radius: 6 },
+  { shape: "circle", type: "antigrav", pos: [4, 208 + section1YDelta], radius: 3 },
+
+  // { shape: "rect", type: "wall", pos: [0, 300+section1YDelta], size: [16, 0.8] },
+  // { shape: "circle", type: "antigrav", pos: [0, 300 + section1YDelta], radius: 32 },
+  
+  { shape: "rect", type: "wall", pos: [-31.2, 244 + section1YDelta], size: [0.8, 16], rotation: 0 },
+  { shape: "circle", type: "antigrav", pos: [-40, 228 + section1YDelta], radius: 8 },
+  { shape: "rect", type: "antigrav", pos: [-40, 244 + section1YDelta], size: [8, 16], rotation: 0 }, // // HARD path1
+  { shape: "circle", type: "antigrav", pos: [-40, 260 + section1YDelta], radius: 8 },
+
+  { shape: "rect", type: "ground", pos: [7.7, 230+section1YDelta], size: [36, 2] },
+  { shape: "rect", type: "ground", pos: [7.7, 310+section1YDelta], size: [36, 2] },  
+  { shape: "circle", type: "antigrav", pos: [-36, 290 + section1YDelta], radius: 4 }
+
+];
+
+let section2YDelta = 340;
 let section2Data = [
+  { shape: "circle", type: "antigrav", pos: [36, -28+section2YDelta], radius: 3 },
+  { shape: "circle", type: "antigrav", pos: [34, -24+section2YDelta], radius: 3 },
+  { shape: "circle", type: "antigrav", pos: [31, -20+section2YDelta], radius: 3 },
+  { shape: "circle", type: "antigrav", pos: [28, -16+section2YDelta], radius: 3 },
+
   { shape: "circle", type: "antigrav", pos: [11, section2YDelta], radius: 9 },
   { shape: "circle", type: "antigrav", pos: [-10, 24 + section2YDelta], radius: 12 },
-  { shape: "circle", type: "antigrav", pos: [-30, 40 + section2YDelta], radius: 8 },
+  { shape: "circle", type: "antigrav", pos: [-22, 48 + section2YDelta], radius: 8 },
 
   { shape: "circle", type: "antigrav", pos: [-36, 67 + section2YDelta], radius: 3 },
   { shape: "circle", type: "antigrav", pos: [-32, 79 + section2YDelta], radius: 3.5 },
@@ -244,20 +287,12 @@ let section2Data = [
   { shape: "circle", type: "antigrav", pos: [-34, 92 + section2YDelta], radius: 4.5 },
   { shape: "circle", type: "antigrav", pos: [-28, 110 + section2YDelta], radius: 4 },
 
-  { shape: "rect", type: "wall", pos: [31.2, 62 + section2YDelta], size: [0.8, 32], rotation: 0 },
-  { shape: "circle", type: "antigrav", pos: [40, 30 + section2YDelta], radius: 8 }, // HARD path1
-  { shape: "rect", type: "antigrav", pos: [40, 62 + section2YDelta], size: [8, 32], rotation: 0 }, // // HARD path1
-  { shape: "circle", type: "antigrav", pos: [40, 94 + section2YDelta], radius: 8 },
-  { shape: "circle", type: "antigrav", pos: [38, 120 + section2YDelta], radius: 0.7 },
-  { shape: "circle", type: "antigrav", pos: [32, 140 + section2YDelta], radius: 1 },
-  { shape: "circle", type: "antigrav", pos: [28, 160 + section2YDelta], radius: 1.5 },
-
   { shape: "circle", type: "antigrav", pos: [-10, 136 + section2YDelta], radius: 17 },
 
-  { shape: "rect", type: "ground", pos: [-35, 178 + section2YDelta], size: [10, 2], rotation: 0 },
+  { shape: "rect", type: "ground", pos: [-25, 178 + section2YDelta], size: [16, 2], rotation: 0 },
 ];
 
-let section3YDelta = 35 + section2YDelta;
+let section3YDelta = 20 + section2YDelta;
 let section3Data = [
   // Upward SLIDE
   { shape: "rect", type: "wall", pos: [-7.4, 176.4+section3YDelta], size: [28, 0.8], rotation: -10*Math.PI/180 },

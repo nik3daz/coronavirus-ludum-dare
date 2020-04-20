@@ -53,7 +53,7 @@ export function createAntigravFixture(shape, ground) {
     let direction = h_v.length() * Math.sin(h_va - angle) / 50;
     let impact = h_v.length() * Math.cos(h_va - angle) / 50;
     impact = Math.max(Math.min(impact, 5), -5);
-    console.log(direction);
+    // console.log(direction);
 
 
     angle = -angle + 2 * Math.PI;
