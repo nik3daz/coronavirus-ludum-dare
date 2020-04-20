@@ -192,11 +192,16 @@ planck.testbed(function (testbed) {
       let position = hero.body.getPosition();
       hero.body.setLinearDamping(0);
 
-      if (hero.body.getUserData().touching && !hero.body.getUserData().ignoreAntigrav) {
+      if (hero.body.getUserData().touching) {
         if (hero.body.getLinearVelocity().y < 0)
           hero.body.setLinearDamping(0.4);
 
-        hero.body.setGravityScale(-0.8);
+        if (hero.body.getUserData().ignoreAntigrav) {
+          hero.body.setGravityScale(0.4);
+        } else {
+          hero.body.setGravityScale(-0.8);
+        }
+          
 
       } else {
         hero.body.setGravityScale(1);
