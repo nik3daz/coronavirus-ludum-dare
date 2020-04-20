@@ -10,12 +10,12 @@ let renderStyle = {
 let sectionsToLoad = [
   true, // Section 1
   true, // Section 2
-  true  // Section 3
+  false  // Section 3
 ];
 
-// let heroStartLoc = Vec2(30, -20);
+let heroStartLoc = Vec2(30, -20);
 // let heroStartLoc = Vec2(-31, 153);
-let heroStartLoc = Vec2(0, 200);
+// let heroStartLoc = Vec2(0, 200);
 
 pl = planck,
 Vec2 = pl.Vec2;
@@ -60,9 +60,9 @@ planck.testbed(function (testbed) {
   // -------------------------------------
     // loadRandomCircles({ground: ground, groundHeight:groundSize.y});
   if (sectionsToLoad.length > 0 && sectionsToLoad[0])
-    loadLevelData({ lvlDat: section1Data, groundHeight: groundSize.y });
-  if (sectionsToLoad.length > 1 && sectionsToLoad[1])
     loadLevelData({ lvlDat: section2Data, groundHeight: groundSize.y });
+  if (sectionsToLoad.length > 1 && sectionsToLoad[1])
+    loadLevelData({ lvlDat: section3Data, groundHeight: groundSize.y });
   if (sectionsToLoad.length > 2 && sectionsToLoad[2])
     loadLevelData({ lvlDat: section3Data, groundHeight: groundSize.y });
 
@@ -232,42 +232,41 @@ function loadRandomCircles({ groundHeight }) {
 
 // =================================================
 
-let section1Data = [
-  { shape: "circle", type: "antigrav", pos: [11, 0], radius: 9 },
-  { shape: "circle", type: "antigrav", pos: [-10, 24], radius: 12 },
-  { shape: "circle", type: "antigrav", pos: [-30, 40], radius: 8 },
-
-  { shape: "circle", type: "antigrav", pos: [-36, 67], radius: 3 },
-  { shape: "circle", type: "antigrav", pos: [-32, 79], radius: 3.5 },
-  { shape: "circle", type: "antigrav", pos: [-18, 75], radius: 7 },
-  { shape: "circle", type: "antigrav", pos: [-34, 92], radius: 4.5 },
-  { shape: "circle", type: "antigrav", pos: [-28, 110], radius: 4 },
-
-  { shape: "rect", type: "wall", pos: [31.2, 62], size: [0.8, 32], rotation: 0 },
-  { shape: "circle", type: "antigrav", pos: [40, 30], radius: 8 }, // HARD path1
-  { shape: "rect", type: "antigrav", pos: [40, 62], size: [8, 32], rotation: 0 }, // // HARD path1
-  { shape: "circle", type: "antigrav", pos: [40, 94], radius: 8 },
-  { shape: "circle", type: "antigrav", pos: [38, 120], radius: 0.7 },
-  { shape: "circle", type: "antigrav", pos: [32, 140], radius: 1 },
-  { shape: "circle", type: "antigrav", pos: [28, 160], radius: 1.5 },
-
-  { shape: "circle", type: "antigrav", pos: [-10, 136], radius: 17 },
-
-  { shape: "rect", type: "ground", pos: [-35, 178], size: [10, 2], rotation: 0 },
-];
-
-let upwardSlideYDelta = 35;
+let section2YDelta = 35;
 let section2Data = [
-  // Upward SLIDE
-  { shape: "rect", type: "wall", pos: [-7.4, 176.4+upwardSlideYDelta], size: [28, 0.8], rotation: -10*Math.PI/180 },
-  { shape: "rect", type: "wall", pos: [4, 183.1+upwardSlideYDelta], size: [38, 0.4], rotation: -10*Math.PI/180 },
-  { shape: "rect", type: "ground", pos: [4.14, 183.8+upwardSlideYDelta], size: [38, 0.4], rotation: -10*Math.PI/180 },
-  { shape: "rect", type: "antigrav", pos: [0, 179.5+upwardSlideYDelta], size: [42, 4.2], rotation: -10*Math.PI/180 },
-  { shape: "circle", type: "antigrav", pos: [31, 163.5+upwardSlideYDelta], radius: 15 },
-  { shape: "circle", type: "antigrav", pos: [-34, 195+upwardSlideYDelta], radius: 14 }
+  { shape: "circle", type: "antigrav", pos: [11, section2YDelta], radius: 9 },
+  { shape: "circle", type: "antigrav", pos: [-10, 24 + section2YDelta], radius: 12 },
+  { shape: "circle", type: "antigrav", pos: [-30, 40 + section2YDelta], radius: 8 },
+
+  { shape: "circle", type: "antigrav", pos: [-36, 67 + section2YDelta], radius: 3 },
+  { shape: "circle", type: "antigrav", pos: [-32, 79 + section2YDelta], radius: 3.5 },
+  { shape: "circle", type: "antigrav", pos: [-18, 75 + section2YDelta], radius: 7 },
+  { shape: "circle", type: "antigrav", pos: [-34, 92 + section2YDelta], radius: 4.5 },
+  { shape: "circle", type: "antigrav", pos: [-28, 110 + section2YDelta], radius: 4 },
+
+  { shape: "rect", type: "wall", pos: [31.2, 62 + section2YDelta], size: [0.8, 32], rotation: 0 },
+  { shape: "circle", type: "antigrav", pos: [40, 30 + section2YDelta], radius: 8 }, // HARD path1
+  { shape: "rect", type: "antigrav", pos: [40, 62 + section2YDelta], size: [8, 32], rotation: 0 }, // // HARD path1
+  { shape: "circle", type: "antigrav", pos: [40, 94 + section2YDelta], radius: 8 },
+  { shape: "circle", type: "antigrav", pos: [38, 120 + section2YDelta], radius: 0.7 },
+  { shape: "circle", type: "antigrav", pos: [32, 140 + section2YDelta], radius: 1 },
+  { shape: "circle", type: "antigrav", pos: [28, 160 + section2YDelta], radius: 1.5 },
+
+  { shape: "circle", type: "antigrav", pos: [-10, 136 + section2YDelta], radius: 17 },
+
+  { shape: "rect", type: "ground", pos: [-35, 178 + section2YDelta], size: [10, 2], rotation: 0 },
 ];
 
-let section3Data = [];
+let section3YDelta = 35 + section2YDelta;
+let section3Data = [
+  // Upward SLIDE
+  { shape: "rect", type: "wall", pos: [-7.4, 176.4+section3YDelta], size: [28, 0.8], rotation: -10*Math.PI/180 },
+  { shape: "rect", type: "wall", pos: [4, 183.1+section3YDelta], size: [38, 0.4], rotation: -10*Math.PI/180 },
+  { shape: "rect", type: "ground", pos: [4.14, 183.8+section3YDelta], size: [38, 0.4], rotation: -10*Math.PI/180 },
+  { shape: "rect", type: "antigrav", pos: [0, 179.5+section3YDelta], size: [42, 4.2], rotation: -10*Math.PI/180 },
+  { shape: "circle", type: "antigrav", pos: [31, 163.5+section3YDelta], radius: 15 },
+  { shape: "circle", type: "antigrav", pos: [-34, 195+section3YDelta], radius: 14 }
+];
 
 function loadLevelData({ lvlDat, groundHeight }) {
   lvlDat.forEach(element => {
