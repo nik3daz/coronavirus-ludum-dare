@@ -118,15 +118,7 @@ planck.testbed(function (testbed) {
       let ag_shape = antigrav.getShape();
       // console.log(ag_shape);
       if (ag_shape.m_type === 'circle') {
-        // Apply forces to Circle Shaoes
-        let ag_p = ag_shape.getCenter();
-        ag_p = Vec2.add(ag_p, antigrav.getBody().getTransform().p);
-        let h_p = hero.body.getPosition();
-        let d = Vec2.sub(h_p, ag_p);
-        let angle = Math.atan2(d.y, d.x);
-
-        // let h_v = hero.body.getLinearVelocity().length();
-        antigrav.splash(angle, -2);
+        antigrav.splash(hero, antigrav);
       }
       
       if (userData) {
@@ -173,14 +165,7 @@ planck.testbed(function (testbed) {
       let ag_shape = antigrav.getShape();
       if (ag_shape.m_type === 'circle') {
         // Apply forces to Circle Shaoes
-        let ag_p = ag_shape.getCenter();
-        ag_p = Vec2.add(ag_p, antigrav.getBody().getTransform().p);
-        let h_p = hero.body.getPosition();
-        let d = Vec2.sub(h_p, ag_p);
-        let angle = Math.atan2(d.y, d.x);
-
-        // let h_v = hero.body.getLinearVelocity().length();
-        antigrav.splash(angle, 2);
+        antigrav.splash(hero, antigrav);
       }
     }
   });
@@ -289,7 +274,6 @@ function loadLevelData({ lvlDat, groundHeight }) {
       newObj.render = renderStyle[element.type];
     }
   });
-  antigravList[1].splash(Math.PI / 2, 3);
 }
 
 // =================================================

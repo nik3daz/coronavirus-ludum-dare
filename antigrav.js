@@ -1,4 +1,3 @@
-
 export function createAntigravFixture(shape, ground) {
   let fixture = ground.createFixture({ shape: shape, isSensor: true });
 
@@ -42,10 +41,30 @@ export function createAntigravFixture(shape, ground) {
     }
   };
 
-  fixture.splash = (angle, s) => {
+  fixture.splash = (hero, antigrav) => {
+    let ag_p = antigrav.getShape().getCenter();
+    ag_p = Vec2.add(ag_p, antigrav.getBody().getTransform().p);
+    let h_p = hero.body.getPosition();
+    let d = Vec2.sub(h_p, ag_p);
+    let angle = Math.atan2(d.y, d.x);
+
+    let h_v = hero.body.getLinearVelocity();
+    let h_va = Math.atan2(h_v.y, h_v.x);
+    let direction = h_v.length() * Math.sin(h_va - angle) / 50;
+    let impact = h_v.length() * Math.cos(h_va - angle) / 50;
+    impact = Math.max(Math.min(impact, 5), -5);
+    console.log(direction);
+
+
     angle = -angle + 2 * Math.PI;
     angle %= 2 * Math.PI
-    springs[Math.floor(angle / 2 / Math.PI * springs.length)].velocity = s;
+    let idx = Math.floor(angle / 2 / Math.PI * springs.length);
+    let SPREAD = 4;
+    for (let i = idx - SPREAD; i <= idx + SPREAD; i++) {
+      let angle = (i - idx) / SPREAD * Math.PI;
+      let normalized_i = (i + springs.length) % springs.length;
+      springs[normalized_i].velocity = impact * Math.cos(angle) + Math.sign(i - idx) * Math.cos(angle) * direction;
+    }
   };
 
   if (shape.getType() !== 'circle')
