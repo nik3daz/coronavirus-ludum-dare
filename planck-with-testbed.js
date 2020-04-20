@@ -424,7 +424,7 @@ Viewer.prototype.renderWorld = function(world) {
                 var type = f.getType();
                 var shape = f.getShape();
                 if (f.drawCallback) {
-                    f.ui = f.drawCallback(f, this._options, Stage);
+                    f.ui = f.drawCallback(f, Object.assign({}, this._options), Stage);
                 } else {
                     if (type == "circle") {
                         f.ui = viewer.drawCircle(shape, this._options);
